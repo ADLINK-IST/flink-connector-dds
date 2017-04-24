@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.prismtech.vortex.flink</groupId>
+    <artifactId>flink-connector-dds</artifactId>
+    <version>0.9.0</version>
+    <packaging>jar</packaging>
+
+    <name>flink-connector-dds</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <java.version>1.8</java.version>
+
+        <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
+        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+
+        <flink.version>1.2.0</flink.version>
+        <vortex.commons.version>0.9.0</vortex.commons.version>
+        <vortex.cafe.version>2.3.2</vortex.cafe.version>
+
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-java_2.10</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.prismtech.vortex</groupId>
+            <artifactId>vortex-commons</artifactId>
+            <version>${vortex.commons.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.prismtech.cafe</groupId>
+            <artifactId>cafe</artifactId>
+            <version>${vortex.cafe.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Configure Maven to target Java 1.8 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-vortex-edge-maven</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/vortex-edge/maven</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-vortex-edge-maven</id>
+            <name>vortex-edge-maven</name>
+            <url>https://api.bintray.com/maven/vortex-edge/maven/vortex-flink/;publish=1</url>
+        </repository>
+    </distributionManagement>
+</project>
