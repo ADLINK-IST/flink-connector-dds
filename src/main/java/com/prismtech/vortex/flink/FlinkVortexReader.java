@@ -14,6 +14,7 @@ import org.omg.dds.sub.DataReaderQos;
 import org.omg.dds.topic.Topic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vortex.commons.serialization.QoSSerializer;
 import vortex.commons.util.VConfig;
 
 import java.io.IOException;
@@ -115,16 +116,20 @@ public class FlinkVortexReader<T>
         o.writeObject(topic.getName());
         o.writeObject(topic.getTypeSupport().getType());
         o.writeObject(readerConfig);
-        o.writeObject(qos);
+        QoSSerializer qSerializer = new QoSSerializer(defaultPolicyFactory());
+        o.writeObject(qSerializer.toSerializable(qos));
     }
 
+    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream o)
             throws IOException, ClassNotFoundException {
         String topipName = (String) o.readObject();
         Class<T> topicType = (Class<T>) o.readObject();
         readerConfig = (Properties) o.readObject();
-        qos = (QosPolicy.ForDataReader[]) o.readObject();
-
+        QoSSerializer qSerializer = new QoSSerializer(defaultPolicyFactory());
+        QosPolicy[] policies = qSerializer.fromSerializable((Serializable) o.readObject());
+        qos = VortexUtils.filterType(policies, QosPolicy.ForDataReader.class);
         topic = defaultDomainParticipant().createTopic(topipName, topicType);
     }
+
 }
