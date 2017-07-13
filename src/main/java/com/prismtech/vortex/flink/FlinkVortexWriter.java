@@ -6,9 +6,11 @@ import org.omg.dds.core.policy.QosPolicy;
 import org.omg.dds.pub.DataWriter;
 import org.omg.dds.pub.DataWriterQos;
 import org.omg.dds.topic.Topic;
+import org.omg.dds.type.TypeSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vortex.commons.serialization.QoSSerializer;
+import vortex.commons.util.VConfig;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -86,6 +88,7 @@ public class FlinkVortexWriter<IN>
             throws IOException {
         o.writeObject(topic.getName());
         o.writeObject(topic.getTypeSupport().getType());
+        o.writeObject(topic.getTypeSupport().getTypeName());
         o.writeObject(writerConfig);
         QoSSerializer qSerializer = new QoSSerializer(defaultPolicyFactory());
         o.writeObject(qSerializer.toSerializable(qos));
@@ -96,11 +99,12 @@ public class FlinkVortexWriter<IN>
             throws IOException, ClassNotFoundException {
         String topipName = (String) o.readObject();
         Class<IN> topicType = (Class<IN>) o.readObject();
+        String tregType = (String) o.readObject();
         writerConfig = (Properties) o.readObject();
         QoSSerializer qSerializer = new QoSSerializer(defaultPolicyFactory());
         QosPolicy[] policies = qSerializer.fromSerializable((Serializable) o.readObject());
         qos = VortexUtils.filterType(policies, QosPolicy.ForDataWriter.class);
-
-        topic = defaultDomainParticipant().createTopic(topipName, topicType);
+        TypeSupport<IN> ts = TypeSupport.newTypeSupport(topicType, tregType, VConfig.ENV);
+        topic = defaultDomainParticipant().createTopic(topipName, ts);
     }
 }
